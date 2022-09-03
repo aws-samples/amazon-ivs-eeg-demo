@@ -1,33 +1,25 @@
-# Amazon-ivs-eeg-demo - `@amzn/amazon-ivs-eeg-demo`
+<a href="https://docs.aws.amazon.com/ivs/"><img align="right" width="128px" src="./ivs-logo.svg"></a>
+# amazon-ivs-eeg-demo
 
-The NPM package name should always start with `@amzn/` to cleanly separate from
-public packages, avoid accidental publish to public repository, and allow
-publishing to CodeArtifact.
+A React based demo of using Amazon IVS Web Broadcast, Timed Metadata, and the Web Player SDK to send brain waves along with a live stream and render them in a chart.
 
-The package is built with
-[NpmPrettyMuch](https://w.amazon.com/bin/view/NpmPrettyMuch/GettingStarted/v1)
-and allows using internal (first-party) dependencies as well as external
-npmjs.com packages.
+# About
 
-Add registry dependencies with `brazil-build install` exactly the same as [`npm
-install`](https://docs.npmjs.com/cli-commands/install.html). You can check
-latest state of external dependencies on https://npmpm.corp.amazon.com/
-Important: always use `brazil-build` wrapper for npm, using `npm` directly will
-use the public registry instead of the internal registry.
+Refer to the blog post [Live Streaming my Brain with Amazon IVS, React and a Muse Headband](https://dev.to/aws/live-streaming-my-brain-with-amazon-ivs-react-and-a-muse-headband-40gj).
 
-Add brazil packages that build npm packages to the `dependencies` or
-`test-dependencies` sections in the Config file,  then add a `*` dependency or
-devDependencies to package.json. You should match `test-dependencies` with
-`devDependencies`, and normal `dependencies` with `dependencies`.
+# Getting Started
 
-NpmPrettyMuch 1.0 has special behavior for running tests during build. The
-option `"runTest": "never"` disabled this and instead tests are wired up in
-`prepublishOnly`. NpmPrettyMuch will invoke `prepublishOnly` and everything can
-configured in there the [same as with external
-npm](https://docs.npmjs.com/misc/scripts). Files to published are configured
-using [`files` in
-`package.json`](https://docs.npmjs.com/configuring-npm/package-json.html#files).
-The option `ciBuild` uses [`npm
-ci`](https://docs.npmjs.com/cli-commands/ci.html) instead of `npm install` and
-results in faster install times and guarantees all of your dependencies are
-locked appropriately.
+Create a file called `.env` in the root of this project and populate it with the paths to your preconfigured lambda function and your IVS stream URL.
+
+```
+REACT_APP_LAMBDA_URL = ''
+REACT_APP_STREAM_URL = ''
+```
+
+Then start the application with:
+
+```
+npm start
+```
+
+And navigate to http://localhost:3000
