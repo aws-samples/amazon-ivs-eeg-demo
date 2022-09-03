@@ -1,8 +1,8 @@
-package.Amazon-ivs-eeg-demo = {
+package.Amazon - ivs - eeg - demo = {
     interfaces = (1.0);
 
-    build-system = npm-pretty-much;
-    build-tools = {
+    build - system = npm - pretty - much;
+    build - tools = {
         1.0 = {
             NpmPrettyMuch = 1.0;
             NodeJS = default;
@@ -11,13 +11,11 @@ package.Amazon-ivs-eeg-demo = {
 
     dependencies = {
         1.0 = {
-            # Declare brazil packages that build package.json dependencies here
         };
     };
 
-    test-dependencies = {
+    test - dependencies = {
         1.0 = {
-            # Declare brazil packages that build package.json devDependencies here
         };
     };
 };
