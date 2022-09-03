@@ -1,0 +1,19 @@
+{
+  "name": "@amzn/amazon-ivs-eeg-demo",
+  "version": "0.1.0",
+  "description": "",
+  "author": "",
+  "license": "UNLICENSED",
+  "repository": "ssh://git.amazon.com/pkg/Amazon-ivs-eeg-demo",
+  "homepage": "https://code.amazon.com/packages/Amazon-ivs-eeg-demo",
+  "scripts": {
+    "test": "echo 'running tests'",
+    "build": "echo 'building the packages'",
+    "prepublishOnly": "npm run build && npm run test"
+  },
+  "files": [],
+  "npm-pretty-much": {
+    "runTest": "never",
+    "ciBuild": "always"
+  }
+}
