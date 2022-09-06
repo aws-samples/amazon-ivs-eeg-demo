@@ -112,9 +112,9 @@ aws ivs delete-channel --name my-channel
 
 Endpoint: `<ApiURL>send`
 
-Method: PUT
+Method: **PUT**
 
-Content Type: JSON
+Content Type: **JSON**
 
 Payload:
 ```
@@ -123,7 +123,8 @@ Payload:
   "metadata": "my-metadata"
 }
 ```
-Response Code: 200
+Response Code: **200**
+
 Response Body:
 ```
 {"published": true}
