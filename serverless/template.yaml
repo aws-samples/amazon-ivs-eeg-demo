@@ -6,9 +6,9 @@ Globals:
     Runtime: nodejs16.x
     Timeout: 30
     MemorySize: 128
-    Environment:
   Api:
-    EndpointConfiguration: REGIONAL
+    EndpointConfiguration: 
+      Type: REGIONAL
     Cors:
       AllowMethods: "'POST, OPTIONS'"
       AllowHeaders: "'Content-Type'"
@@ -46,7 +46,6 @@ Resources:
     Properties:
       Handler: index.send
       CodeUri: lambda/
-      Policies:
       Events:
         Api1:
           Type: Api
