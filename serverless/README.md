@@ -111,7 +111,9 @@ aws ivs delete-channel --name my-channel
 ### Send a record to IVS
 
 Endpoint: `<ApiURL>send`
+
 Method: PUT
+
 Content Type: JSON
 
 Payload:
