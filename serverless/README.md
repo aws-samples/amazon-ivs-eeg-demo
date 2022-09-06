@@ -113,6 +113,7 @@ aws ivs delete-channel --name my-channel
 Endpoint: `<ApiURL>send`
 Method: PUT
 Content Type: JSON
+
 Payload:
 ```
 {
