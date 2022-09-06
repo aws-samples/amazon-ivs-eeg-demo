@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Amazon IVS EEG Demo
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Timeout: 30
+    MemorySize: 128
+    Environment:
+  Api:
+    EndpointConfiguration: REGIONAL
+    Cors:
+      AllowMethods: "'POST, OPTIONS'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
+      MaxAge: "'600'"
+Resources:
+  IVSAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: IVSAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'ivs:PutMetadata'
+            Resource: '*'
+      Roles:
+        - Ref: SendMetadataLambdaRole
+  ApiAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: ApiAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Resource: '*'
+      Roles:
+        - Ref: SendMetadataLambdaRole
+  SendMetadataLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.send
+      CodeUri: lambda/
+      Policies:
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /send
+            Method: POST
+Outputs:
+  ApiURL:
+    Description: "API endpoint URL for Prod environment"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
