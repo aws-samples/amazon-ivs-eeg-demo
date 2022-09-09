@@ -44,5 +44,5 @@ export default class BrainSummary extends Component {
   }
 }
 BrainSummary.propTypes = {
-    dataset: PropTypes.object,
+  dataset: PropTypes.object,
 };

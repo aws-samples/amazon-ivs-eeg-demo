@@ -15,13 +15,13 @@ Refer to the blog post [Live Streaming my Brain with Amazon IVS, React and a Mus
 
 # Getting Started
 
-Create a file named `.env` inside the web-ui project directory containing the `ApiURL` from the [serverless app](../serverless).
+Create a file named `.env` inside the `ui` project directory containing the `ApiURL` from the [serverless app](../serverless).
 
-Replace `<server-endpoint>` with your `ApiURL`. Replace `<stream-url>` with the playback URL for your IVS channel.
+Replace `<ApiURL>` with your `ApiURL`. Replace `<playback-URL>` with the playback URL for your IVS channel.
 
 ```
-REACT_APP_LAMBDA_URL = '<server-endpoint>'
-REACT_APP_STREAM_URL = '<stream-url>'
+REACT_APP_LAMBDA_URL = '<ApiURL>'
+REACT_APP_STREAM_URL = '<playback-URL>'
 ```
 
 ## Running the demo
