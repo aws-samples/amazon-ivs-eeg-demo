@@ -71,7 +71,9 @@ aws cloudformation describe-stacks \
 
 Run the following command to create an Amazon IVS Channel for testing. You 
 can skip this step if you already have one or more channels in your 
-account.
+account. Note: by default, this will create a "Standard" channel type. 
+If you choose to create a "Basic" channel instead, you will need to modify 
+the `Broadcast.jsx` component in the `ui` project to account for this.
 
 Replace `<my-channel-name>` with a channel name.
 

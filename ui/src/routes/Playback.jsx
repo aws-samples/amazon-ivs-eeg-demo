@@ -12,6 +12,7 @@ const { IVSPlayer } = window;
 const { create: createMediaPlayer, isPlayerSupported, PlayerEventType, PlayerState } = IVSPlayer;
 const { ENDED, PLAYING, READY, BUFFERING } = PlayerState;
 const { TEXT_METADATA_CUE, ERROR } = PlayerEventType;
+// eslint-disable-next-line no-undef
 const STREAM_URL = process.env.REACT_APP_STREAM_URL;
 
 export class Playback extends Component {
@@ -99,12 +100,9 @@ export class Playback extends Component {
 
   componentWillUnmount() {
     if (!this.playerRef.current) return;
-    this.playerRef.current.removeEventListener(READY, this.onPlayerStateChange);
     this.playerRef.current.removeEventListener(PLAYING, this.onPlayerStateChange);
-    this.playerRef.current.removeEventListener(BUFFERING, this.onPlayerStateChange);
     this.playerRef.current.removeEventListener(ENDED, this.onPlayerStateChange);
     this.playerRef.current.removeEventListener(ERROR, this.onPlayerError);
-    this.playerRef.current.removeEventListener(TEXT_METADATA_CUE, this.onPlayerMetadata);
 
     this.playerRef.current.pause();
     this.playerRef.current.delete();

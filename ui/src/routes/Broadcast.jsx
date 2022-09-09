@@ -1,16 +1,20 @@
-import React, { Component } from 'react';
-import { zipSamples, MuseClient } from 'muse-js';
-import { powerByBand, epoch, fft } from '@neurosity/pipes';
-import './Broadcast.css';
-import { Badge, Button, Card, Col, Form, Modal, Row } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBrain, faGear } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { epoch, fft, powerByBand } from '@neurosity/pipes';
 import IVSBroadcastClient, { STANDARD_LANDSCAPE } from 'amazon-ivs-web-broadcast';
+import { MuseClient, zipSamples } from 'muse-js';
+import React, { Component } from 'react';
+import { Badge, Button, Card, Col, Form, Modal, Row } from 'react-bootstrap';
 import { Bar } from 'react-chartjs-2';
+import { Util } from '../util/broadcast-util';
+import './Broadcast.css';
 
+// eslint-disable-next-line no-undef
 const LAMBDA_URL = `${process.env.REACT_APP_LAMBDA_URL}/send`;
+const util = new Util();
 
 export class Broadcast extends Component {
+  
   constructor() {
     super();
     this.chartReference = React.createRef();
@@ -20,10 +24,10 @@ export class Broadcast extends Component {
       museClient: null,
       isConnected: false,
       isBroadcasting: false,
-      showModal: false,
       ingestEndpoint: '',
       streamKey: '',
       channelArn: '',
+      showModal: false,
       cameraOptions: [],
       micOptions: [],
       selectedVideoDeviceId: '',
@@ -33,54 +37,8 @@ export class Broadcast extends Component {
       audioStream: null,
     };
 
-    this.state.previewData = {
-      labels: ['Delta', 'Theta', 'Alpha', 'Beta', 'Gamma'],
-      datasets: [
-        {
-          label: 'Brain Activity',
-          fill: true,
-          data: [0,0,0,0,0],
-          backgroundColor: 'rgba(255,153,17,.5)',
-          borderColor: '#000000',
-        }
-      ],
-    };
-
-    this.state.barOptions = {
-      responsive: false,
-      plugins: {
-        title: {
-          display: true,
-          text: 'Brain Activity',
-          font: {
-            size: 10,
-          }
-        },
-        legend: {
-          display: false
-        },
-      },
-      elements: {
-        line: {
-          borderColor: '#000000',
-          borderWidth: 1
-        },
-        point: {
-          radius: 0
-        }
-      },
-      tooltips: {
-        enabled: false
-      },
-      scales: {
-        yAxes: {
-            display: false
-        },
-        x:{
-          display: false
-        }
-      }
-    };
+    this.state.previewData = Util.brainPreviewChartData;
+    this.state.barOptions = Util.barOptions;
   }
 
   async componentDidMount() {
@@ -94,89 +52,30 @@ export class Broadcast extends Component {
     });
 
     // init web broadcast
-    await this.handlePermissions();
-    await this.getDevices();
-    this.setState({
-      broadcastClient: IVSBroadcastClient.create({
-        streamConfig: STANDARD_LANDSCAPE,
-        ingestEndpoint: this.state.ingestEndpoint,
-      })
+    await util.handlePermissions();
+
+    let client = IVSBroadcastClient.create({
+      streamConfig: STANDARD_LANDSCAPE,
+      ingestEndpoint: this.state.ingestEndpoint,
     });
-    await this.createVideoStream();
-    await this.createAudioStream();
-    this.previewVideo();
+
+    let devices = await util.getDevices(settings.selectedVideoDeviceId, settings.selectedAudioDeviceId);
+    const videoStream = await util.createVideoStream(client, devices.selectedVideoDeviceId);
+    const audioStream = await util.createAudioStream(client, devices.selectedAudioDeviceId);
+
+    const newState = { 
+      broadcastClient: client,
+      audioStream, 
+      videoStream,
+      selectedAudioDeviceId: devices.selectedAudioDeviceId,
+      selectedVideoDeviceId: devices.selectedVideoDeviceId,
+      cameraOptions: devices.cameraOptions,
+      micOptions: devices.micOptions,
+    };
+    this.setState(newState, () => {
+      this.previewVideo();
+    });
   }
-
-  handlePermissions = async () => {
-    let permissions;
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        for (const track of stream.getTracks()) {
-            track.stop();
-        }
-        permissions = { video: true, audio: true };
-    }
-    catch (err) {
-        permissions = { video: false, audio: false };
-        console.error(err.message);
-    }
-    if (!permissions.video) {
-        console.error('Failed to get video permissions.');
-    } else if (!permissions.audio) {
-        console.error('Failed to get audio permissions.');
-    }
-  };
-
-  getDevices = async () => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-    const audioDevices = devices.filter((d) => d.kind === 'audioinput');
-    videoDevices.forEach((device, idx) => {
-        const option = <option key={device.deviceId} value={device.deviceId}>{device.label}</option>;
-        if (!this.state.selectedVideoDeviceId && idx === 0) {
-            this.state.selectedVideoDeviceId = device.deviceId;
-        }
-        this.state.cameraOptions.push(option);
-    });
-    audioDevices.forEach((device, idx) => {
-        const option = <option key={device.deviceId} value={device.deviceId}>{device.label}</option>;
-        if (!this.state.selectedAudioDeviceId && idx === 0) {
-            this.state.selectedAudioDeviceId = device.deviceId;
-        }
-        this.state.micOptions.push(option);
-    });
-  };
-
-  createVideoStream = async () => {
-    if (this.state.broadcastClient && this.state.broadcastClient.getVideoInputDevice('camera1')) this.state.broadcastClient.removeVideoInputDevice('camera1');
-    const streamConfig = STANDARD_LANDSCAPE;
-    const videoStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-            deviceId: { exact: this.state.selectedVideoDeviceId },
-            width: {
-                ideal: streamConfig.maxResolution.width,
-                max: streamConfig.maxResolution.width,
-            },
-            height: {
-                ideal: streamConfig.maxResolution.height,
-                max: streamConfig.maxResolution.height,
-            },
-        },
-    });
-    this.setState({videoStream});
-    if (this.state.broadcastClient) this.state.broadcastClient.addVideoInputDevice(videoStream, 'camera1', { index: 0 });
-  };
-
-  createAudioStream = async () => {
-      if (this.state.broadcastClient && this.state.broadcastClient.getAudioInputDevice('mic1')) this.state.broadcastClient.removeAudioInputDevice('mic1');
-      const audioStream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-              deviceId: this.state.selectedAudioDeviceId
-          },
-      });
-      this.setState({audioStream});
-      if (this.state.broadcastClient) this.state.broadcastClient.addAudioInputDevice(audioStream, 'mic1');
-  };
 
   previewVideo = () => {
     this.state.broadcastClient.attachPreview(this.previewRef.current);
@@ -208,7 +107,11 @@ export class Broadcast extends Component {
     }
   };
 
-  handleModalClose = () => {
+  handleModalShow = () => {
+    this.setState({showModal: true});
+  };
+
+  handleModalHide = () => {
     const settings = {
       ingestEndpoint: this.state.ingestEndpoint, 
       streamKey: this.state.streamKey,
@@ -217,11 +120,7 @@ export class Broadcast extends Component {
       channelArn: this.state.channelArn,
     };
     localStorage.setItem('web-broadcast', JSON.stringify(settings));
-    this.setState({ showModal: false });
-  };
-
-  handleModalShow = () => {
-    this.setState({ showModal: true });
+    this.setState({showModal: false});
   };
 
   handleIngestEndpointChange = (e) => {
@@ -233,14 +132,16 @@ export class Broadcast extends Component {
   };
 
   handleCamChange = (e) => {
-    this.setState({selectedVideoDeviceId: e.target.value}, () => {
-      this.createVideoStream();
+    this.setState({selectedVideoDeviceId: e.target.value}, async () => {
+      const videoStream = await util.createVideoStream(this.state.broadcastClient, this.state.selectedVideoDeviceId);
+      this.setState({ videoStream });
     });
   };
 
   handleMicChange = (e) => {
-    this.setState({selectedAudioDeviceId: e.target.value}, () => {
-      this.createAudioStream();
+    this.setState({selectedAudioDeviceId: e.target.value}, async () => {
+      const audioStream = await util.createAudioStream(this.state.broadcastClient, this.state.selectedAudioDeviceId);
+      this.setState({ audioStream });
     });
   };
 
@@ -325,11 +226,11 @@ export class Broadcast extends Component {
                   <Badge 
                     bg={this.state.isBroadcasting ? 'badge bg-success' : 'badge bg-danger'} 
                     className='me-1'>
-                      <b>Stream: </b>{this.state.isBroadcasting ? 'Broadcasting' : 'Offline'}
+                    <b>Stream: </b>{this.state.isBroadcasting ? 'Broadcasting' : 'Offline'}
                   </Badge>
                   <Badge 
                     bg={this.state.isConnected ? 'badge bg-success' : 'badge bg-danger'}>
-                      <b>Headband: </b>{this.state.isConnected ? 'Connected' : 'Not Connected'}
+                    <b>Headband: </b>{this.state.isConnected ? 'Connected' : 'Not Connected'}
                   </Badge>
                 </div>
               </Card.Header>
@@ -347,7 +248,7 @@ export class Broadcast extends Component {
                       variant='dark' 
                       disabled={this.state.isConnected || !this.state.isBroadcasting} 
                       onClick={this.connect}>
-                        <FontAwesomeIcon icon={faBrain} /> Connect Muse
+                      <FontAwesomeIcon icon={faBrain} /> Connect Muse
                     </Button>
                   </Col>
                   <Col className='text-center'>
@@ -355,7 +256,7 @@ export class Broadcast extends Component {
                       size='sm'
                       variant={this.state.isBroadcasting ? 'danger' : 'primary'} 
                       onClick={this.handleBroadcast}>
-                        {this.state.isBroadcasting ? 'Stop Broadcast' : 'Broadcast'}
+                      {this.state.isBroadcasting ? 'Stop Broadcast' : 'Broadcast'}
                     </Button>
                   </Col>
                   <Col className='text-end'>
@@ -366,8 +267,7 @@ export class Broadcast extends Component {
             </Card>
           </Col>
         </Row>
-
-        <Modal show={this.state.showModal} onHide={this.handleModalClose}>
+        <Modal show={this.state.showModal} onHide={this.handleModalHide}>
           <Modal.Header closeButton>
             <Modal.Title>Web Broadcast Settings</Modal.Title>
           </Modal.Header>
@@ -412,12 +312,11 @@ export class Broadcast extends Component {
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant='primary' onClick={this.handleModalClose}>
-              Save
+            <Button variant='primary' onClick={this.handleModalHide}>
+                Save
             </Button>
           </Modal.Footer>
         </Modal>
-
       </>
     );
   }
