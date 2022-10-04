@@ -175,7 +175,9 @@ export class Playback extends Component {
                 </div>
               </Card.Header>
               <Card.Body className='d-flex align-items-center'>
-                <video ref={this.videoRef} id='video-player' className='w-100 rounded rounded-3 shadow' controls playsInline></video>
+                <div className="ratio ratio-16x9 position-relative">
+                  <video ref={this.videoRef} id='video-player' className='w-100 rounded rounded-3 shadow' controls playsInline></video>
+                </div>
               </Card.Body>
             </Card>
           </Col>
@@ -195,19 +197,19 @@ export class Playback extends Component {
                   <div>
                     <div className={this.state.currentChannel !== 0 ? 'd-none' : ''}>
                       <BrainSummary dataset={this.state.ch0.datasets[0]} />
-                      <Bar data={this.state.ch0} className='border border-secondary rounded' ref={this.chartReferenceCh0} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '1.1'), title: { display: true, text: 'Channel: ' + channelNames[0] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
+                      <Bar data={this.state.ch0} className='border border-secondary rounded' ref={this.chartReferenceCh0} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '.95'), title: { display: true, text: 'Channel: ' + channelNames[0] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
                     </div>
                     <div className={this.state.currentChannel !== 1 ? 'd-none' : ''}>
                       <BrainSummary dataset={this.state.ch1.datasets[0]} />
-                      <Bar data={this.state.ch1} className='border border-secondary rounded' ref={this.chartReferenceCh1} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '1.1'), title: { display: true, text: 'Channel: ' + channelNames[1] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
+                      <Bar data={this.state.ch1} className='border border-secondary rounded' ref={this.chartReferenceCh1} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '.95'), title: { display: true, text: 'Channel: ' + channelNames[1] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
                     </div>
                     <div className={this.state.currentChannel !== 2 ? 'd-none' : ''}>
                       <BrainSummary dataset={this.state.ch2.datasets[0]} />
-                      <Bar data={this.state.ch2} className='border border-secondary rounded' ref={this.chartReferenceCh2} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '1.1'), title: { display: true, text: 'Channel: ' + channelNames[2] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
+                      <Bar data={this.state.ch2} className='border border-secondary rounded' ref={this.chartReferenceCh2} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '.95'), title: { display: true, text: 'Channel: ' + channelNames[2] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
                     </div>
                     <div className={this.state.currentChannel !== 3 ? 'd-none' : ''}>
                       <BrainSummary dataset={this.state.ch3.datasets[0]} />
-                      <Bar data={this.state.ch3} className='border border-secondary rounded' ref={this.chartReferenceCh3} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '1.1'), title: { display: true, text: 'Channel: ' + channelNames[3] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
+                      <Bar data={this.state.ch3} className='border border-secondary rounded' ref={this.chartReferenceCh3} height={null} width={null} options={{ aspectRatio: (this.state.isPlaying ? '.95' : '.95'), title: { display: true, text: 'Channel: ' + channelNames[3] }, responsive: true, tooltips: { enabled: false }, legend: { display: false } }} />
                     </div>
                   </div>
                 </div>
