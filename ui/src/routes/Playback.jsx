@@ -167,17 +167,14 @@ export class Playback extends Component {
       <div>
         <Row>
           <Col lg='8' xs='12' className='mb-lg-0 mb-3'>
-            <Card className='h-100 border-dark'>
-              <Card.Header className='d-flex justify-content-between bg-dark text-white'>
-                <span className='fw-bold'>IVS Player</span>
-                <div className='align-items-center'>
-                  <Badge bg={this.state.isPlaying ? 'badge bg-success' : 'badge bg-danger'}>{this.state.isPlaying ? 'Online' : 'Offline'}</Badge>
-                </div>
-              </Card.Header>
-              <Card.Body className='d-flex align-items-center'>
+            <div className="w-100">
+              <div className="position-relative ratio ratio-16x9">
                 <video ref={this.videoRef} id='video-player' className='w-100 rounded rounded-3 shadow' controls playsInline></video>
-              </Card.Body>
-            </Card>
+                <div>
+                  <Badge className='position-absolute top-0 end-0 m-2' bg={this.state.isPlaying ? 'badge bg-success' : 'badge bg-danger'}>{this.state.isPlaying ? 'Online' : 'Offline'}</Badge>
+                </div>
+              </div>
+            </div>
           </Col>
           <Col lg='4' xs='12'>
             <Card className='h-100 border-dark'>
